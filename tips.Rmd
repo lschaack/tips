@@ -25,9 +25,9 @@ midTipData = tipData[tipData$AM.PM == 'Mid', ]
 # plots
 par(mfrow = c(2, 2))
 boxplot(x = tipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'All Tips')
-boxplot(x = amTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'AM Cashier Tips')
+boxplot(x = amTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'AM Tips')
 boxplot(x = assBarTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'AssBar Tips')
-boxplot(x = pmTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'PM Cashier Tips')
+boxplot(x = pmTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'PM Tips')
 ```
 
 ## Averages \newline
@@ -53,8 +53,8 @@ midTipPHAvg = mean(midTipData$Tips.per.hour)
 \textbf{Shift} & \textbf{Total} & \textbf{Per Hour} & \\
 \hline \\
 Overall & \$`r signif(univTipAvg, digits = 4)` & \$`r signif(univTipPHAvg, digits = 3)` & `r length(tipData$Tips)` observations \\
-AM Cashier & \$`r signif(amTipAvg, digits = 4)` & \$`r signif(amTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'AM', ]$Tips)` observations \\
-PM Cashier & \$`r signif(pmTipAvg, digits = 4)` & \$`r signif(pmTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'PM', ]$Tips)` observations \\
+AM & \$`r signif(amTipAvg, digits = 4)` & \$`r signif(amTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'AM', ]$Tips)` observations \\
+PM & \$`r signif(pmTipAvg, digits = 4)` & \$`r signif(pmTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'PM', ]$Tips)` observations \\
 Assistant Bar & \$`r signif(assBarTipAvg, digits = 4)` & \$`r signif(assBarTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'assBar', ]$Tips)` observations \\
 Mid (Baseline) & \$`r signif(midTipAvg, digits = 4)` & \$`r signif(midTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'Mid', ]$Tips)` observations \\
 \end{tabular}
@@ -72,7 +72,7 @@ barplot(t(byDay), names.arg = substring(weekdays, first = 1, last = 3),
 ```
 \newline
 \vfill
-The Tuesday tip rate is inordinately high due to one of only a few observations coinciding with Thanksgiving.
+The Tuesday tip rate is inordinately high due to a large portion of only a few observations being AM shifts.
 \vfill
 ```{r echo = FALSE}
 counts = factor(tipData$Day.of.Week)
@@ -89,7 +89,7 @@ plot(counts, names.arg = substring(rev(weekdays), first = 1, last = 3), xlab = '
 	lines(x = pmTipData$Index, y = pmTipData$Tips, col = 'blue')
 	lines(x = assBarTipData$Index, y = assBarTipData$Tips, col = 'green')
 	lines(x = midTipData$Index, y = midTipData$Tips, col = 'orange')
-	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
+	legend(x = "topleft", legend = c("AM", "PM", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
 }
 ```
 \newline
@@ -101,7 +101,7 @@ plot(counts, names.arg = substring(rev(weekdays), first = 1, last = 3), xlab = '
 	lines(x = pmTipData$Index, y = pmTipData$Tips.per.hour, col = 'blue')
 	lines(x = assBarTipData$Index, y = assBarTipData$Tips.per.hour, col = 'green')
 	lines(x = midTipData$Index, y = midTipData$Tips.per.hour, col = 'orange')
-	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
+	legend(x = "topleft", legend = c("AM", "PM", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
 }
 ```
 
@@ -125,7 +125,7 @@ summary(lmod)
 		  		  		 'yellow')))), # holiday
 		  xlab = "Shifts Worked", ylab = "Tips")
 	lines(tipData$Index, predict(lmod))
-	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid", "Holiday"), fill = c("red", "blue", "green", "orange", "yellow"))
+	legend(x = "topleft", legend = c("AM", "PM", "Assistant Bar", "Mid", "Holiday"), fill = c("red", "blue", "green", "orange", "yellow"))
 }
 ```
 

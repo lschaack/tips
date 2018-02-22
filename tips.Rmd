@@ -1,0 +1,138 @@
+---
+title: "Ali's Amante Barista Stats"
+header-includes:
+   - \usepackage{multicol}
+output:
+  pdf_document:
+    latex_engine: pdflatex
+---
+## Boxplots \newline
+\rule[4pt]{\textwidth}{0.4pt}
+```{r echo = FALSE}
+rm(list = ls())
+setwd('/Users/lschaack/Documents/cu/my_stuff/tips')
+tipData = read.csv('tips.csv')
+# clear dollar signs from dollar values to make them numeric
+tipData$Tips = as.numeric(sub('$', '', as.character(tipData$Tips), fixed=TRUE))
+tipData$Tips.per.hour = (tipData$Tips / tipData$Hours)
+tipData$Index = seq(1, nrow(tipData))
+# View(tipData)
+# store valuable subsets
+amTipData = tipData[tipData$AM.PM == 'AM', ]
+pmTipData = tipData[tipData$AM.PM == 'PM', ]
+assBarTipData = tipData[tipData$AM.PM == 'assBar', ]
+midTipData = tipData[tipData$AM.PM == 'Mid', ]
+# plots
+par(mfrow = c(2, 2))
+boxplot(x = tipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'All Tips')
+boxplot(x = amTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'AM Cashier Tips')
+boxplot(x = assBarTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'AssBar Tips')
+boxplot(x = pmTipData$Tips, ylim = c(20, 70), horizontal = TRUE, xlab = 'Tips in Dollars', main = 'PM Cashier Tips')
+```
+
+## Averages \newline
+\rule[4pt]{\textwidth}{0.4pt}
+```{r echo = FALSE}
+# Averages
+univTipAvg = mean(tipData$Tips)
+amTipAvg = mean(amTipData$Tips)
+pmTipAvg = mean(pmTipData$Tips)
+assBarTipAvg = mean(assBarTipData$Tips)
+midTipAvg = mean(midTipData$Tips)
+# Per Hour Averages
+univTipPHAvg = mean(tipData$Tips.per.hour)
+amTipPHAvg = mean(amTipData$Tips.per.hour)
+pmTipPHAvg = mean(pmTipData$Tips.per.hour)
+assBarTipPHAvg = mean(assBarTipData$Tips.per.hour)
+midTipPHAvg = mean(midTipData$Tips.per.hour)
+# beta distribution here? since values are so sparse...
+# show distribution of shifts?
+```
+\begin{center}
+\begin{tabular}{lccl}
+\textbf{Shift} & \textbf{Total} & \textbf{Per Hour} & \\
+\hline \\
+Overall & \$`r signif(univTipAvg, digits = 4)` & \$`r signif(univTipPHAvg, digits = 3)` & `r length(tipData$Tips)` observations \\
+AM Cashier & \$`r signif(amTipAvg, digits = 4)` & \$`r signif(amTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'AM', ]$Tips)` observations \\
+PM Cashier & \$`r signif(pmTipAvg, digits = 4)` & \$`r signif(pmTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'PM', ]$Tips)` observations \\
+Assistant Bar & \$`r signif(assBarTipAvg, digits = 4)` & \$`r signif(assBarTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'assBar', ]$Tips)` observations \\
+Mid (Baseline) & \$`r signif(midTipAvg, digits = 4)` & \$`r signif(midTipPHAvg, digits = 3)` & `r length(tipData[tipData$AM.PM == 'Mid', ]$Tips)` observations \\
+\end{tabular}
+\end{center}
+
+```{r echo = FALSE}
+weekdays = c('Sunday', 'Saturday', 'Friday', 'Thursday', 'Wednesday', 'Tuesday', 'Monday')
+getAvg = function(weekday) {
+	return(mean(tipData[tipData$Day.of.Week == weekday, ]$Tips))
+}
+byDay = lapply(weekdays, getAvg)
+barplot(t(byDay), names.arg = substring(weekdays, first = 1, last = 3),
+		  horiz = TRUE, las = 1, col = 'azure3', xlab = 'Average Dollars Per Hour',
+		  main = 'Tips by Day of the Week')
+```
+\newline
+\vfill
+The Tuesday tip rate is inordinately high due to one of only a few observations coinciding with Thanksgiving.
+\vfill
+```{r echo = FALSE}
+counts = factor(tipData$Day.of.Week)
+counts = factor(counts, levels(counts)[c(2, 6, 7, 5, 1, 3, 4)])
+plot(counts, names.arg = substring(rev(weekdays), first = 1, last = 3), xlab = 'Day of the Week', ylab = 'Number of Shifts Worked', main = 'Number of Shifts Worked By Day')
+```
+
+## Over Time (haw) \newline
+\rule[4pt]{\textwidth}{0.4pt}
+```{r echo = FALSE}
+{
+	plot(x = tipData$Index, y = tipData$Tips, ylim = c(0, 100), xlab = "Shifts Worked", ylab = "Tips")
+	lines(x = amTipData$Index, y = amTipData$Tips, col = 'red')
+	lines(x = pmTipData$Index, y = pmTipData$Tips, col = 'blue')
+	lines(x = assBarTipData$Index, y = assBarTipData$Tips, col = 'green')
+	lines(x = midTipData$Index, y = midTipData$Tips, col = 'orange')
+	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
+}
+```
+\newline
+\vfill
+```{r echo = FALSE}
+{
+	plot(x = tipData$Index, y = tipData$Tips.per.hour, ylim = c(0, 15), xlab = "Shifts Worked", ylab = "Tips Per Hour")
+	lines(x = amTipData$Index, y = amTipData$Tips.per.hour, col = 'red')
+	lines(x = pmTipData$Index, y = pmTipData$Tips.per.hour, col = 'blue')
+	lines(x = assBarTipData$Index, y = assBarTipData$Tips.per.hour, col = 'green')
+	lines(x = midTipData$Index, y = midTipData$Tips.per.hour, col = 'orange')
+	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid"), fill = c("red", "blue", "green", "orange"))
+}
+```
+
+## Multiple linear regression \newline
+\rule[4pt]{\textwidth}{0.4pt}
+```{r echo = FALSE}
+# Potential to be improved by transforming shift name into a "start time" column...
+# ...which, partnered with the Hours feature, might show nicer behavior.
+lmod = lm(Tips ~ Hours + factor(AM.PM) + factor(Day.of.Week), data=tipData)
+summary(lmod)
+```
+
+\vfill
+```{r echo = FALSE}
+{
+	plot(x = tipData$Index, y=tipData$Tips, ylim = c(0, 100),
+		  col = ifelse(tipData$AM.PM == 'AM', 'red',
+		  		  ifelse(tipData$AM.PM == 'PM', 'blue',
+		  		  ifelse(tipData$AM.PM == 'assBar', 'green',
+		  		  ifelse(tipData$AM.PM == 'Mid', 'orange',
+		  		  		 'yellow')))), # holiday
+		  xlab = "Shifts Worked", ylab = "Tips")
+	lines(tipData$Index, predict(lmod))
+	legend(x = "topleft", legend = c("AM Cashier", "PM Cashier", "Assistant Bar", "Mid", "Holiday"), fill = c("red", "blue", "green", "orange", "yellow"))
+}
+```
+
+## Prediction for next shift \newline
+\rule[4pt]{\textwidth}{0.4pt}
+```{r}
+next.shift = data.frame(AM.PM = c('PM'), Day.of.Week = c('Saturday'), Hours = c(7.0))
+prediction = predict(lmod, newdata = next.shift)
+```
+The model, such as it is, predicts \$`r signif(prediction, digits = 4)` $\;\pm\;$ \$`r signif(sigma(lmod), digits = 3)` in tips for the coming shift.
